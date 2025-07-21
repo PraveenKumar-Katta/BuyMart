@@ -3,8 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../features/productSlice";
 import { useNavigate } from "react-router-dom";
-
-let BaseUrl = "http://localhost:5000";
+import { BaseUrl } from "../utiles";
 
 const UserDashBoard = () => {
   const [categories, setCategories] = useState([]);

@@ -9,6 +9,7 @@ import {
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BaseUrl } from "../utiles";
 
 const VendorDashBoard = () => {
   const [showForm, setShowForm] = useState(null);
@@ -37,7 +38,7 @@ const VendorDashBoard = () => {
 
   let getcategories = async () => {
     try {
-      let res = await axios.get(`http://localhost:5000/categories`);
+      let res = await axios.get(`${BaseUrl}/categories`);
       setCategories(res.data.categories);
     } catch (error) {
       console.log(error.message);

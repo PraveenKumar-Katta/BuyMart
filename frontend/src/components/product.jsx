@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { BaseUrl } from "../utiles";
 
-let BaseUrl = "http://localhost:5000";
 
 const Product = () => {
   const { id } = useParams();

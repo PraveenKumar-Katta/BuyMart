@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { BaseUrl } from "../utiles";
 
 const CategoryItems = () => {
   const id = useParams().id;
@@ -11,7 +12,7 @@ const CategoryItems = () => {
   useEffect(() => {
     async function fetchCategoryItems() {
       try {
-        const res = await axios.get(`http://localhost:5000/categories/${id}`);
+        const res = await axios.get(`${BaseUrl}/categories/${id}`);
         console.log(res.data);
         setProducts(res.data);
       } catch (error) {
