@@ -28,22 +28,31 @@ const UserDashBoard = () => {
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  console.log(categories)
 
   return (
     <div>
-      <div className="flex flex-wrap justify-between gap-3 p-4">
-        {categories.map((cat) => (
-          <div
-            onClick={() => navigate(`/category/${cat._id}`)}
-            className="shadow-lg p-4 flex flex-col items-center justify-center cursor-pointer rounded hover:shadow-xl transition"
-            key={cat._id}
-          >
-            <img className="w-20 h-20 object-contain" src={cat.img} alt={cat.title} />
-            <p className="mt-2 font-medium">{cat.title}</p>
-          </div>
-        ))}
+      {/* Categories - Slideable */}
+      <div className="overflow-x-auto scrollbar-hide">
+        <div className="flex space-x-4 px-4 py-3 w-max">
+          {categories.map((cat) => (
+            <div
+              onClick={() => navigate(`/category/${cat._id}`)}
+              className="shadow-lg p-4 w-34 flex-shrink-0 flex flex-col items-center justify-center cursor-pointer rounded hover:shadow-xl transition w-32"
+              key={cat._id}
+            >
+              <img
+                className="w-30 h-30 object-contain"
+                src={cat.img}
+                alt={cat.title}
+              />
+              <p className="mt-2 text-sm font-medium text-center">{cat.title}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
+      {/* Products Section */}
       <div className="p-6 bg-gray-100 min-h-screen">
         <h2 className="text-2xl font-semibold mb-4">All Products</h2>
 
@@ -62,12 +71,16 @@ const UserDashBoard = () => {
                 <img
                   src={product.image}
                   alt={product.name}
-                  className=" object-cover rounded-md mb-3 "
+                  className="w-40 h-40 rounded-md mb-3"
                 />
                 <h3 className="text-lg font-bold">{product.name}</h3>
-                <p className="text-gray-500 text-sm line-clamp-2">{product.description}</p>
+                <p className="text-gray-500 text-sm line-clamp-2">
+                  {product.description}
+                </p>
                 <div className="flex justify-between gap-5 items-center mt-3">
-                  <span className="text-blue-600 font-semibold">₹{product.price}</span>
+                  <span className="text-blue-600 font-semibold">
+                    ₹{product.price}
+                  </span>
                   <button className="bg-blue-600 text-white text-sm px-3 py-1 rounded hover:bg-blue-700">
                     View Details
                   </button>

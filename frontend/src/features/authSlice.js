@@ -1,17 +1,20 @@
 // /store/authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { BaseUrl } from "../utiles";
 
 // Base Axios config
 const API = axios.create({
-  baseURL: "http://localhost:5000/auth",
+  baseURL:`${BaseUrl}/auth`,
 });
+let user=JSON.parse(localStorage.getItem("userInfo"))
 
 export const signupUser = createAsyncThunk(
   "auth/signupUser",
   async (formData, { rejectWithValue }) => {
     try {
       const res = await API.post("/signup", formData);
+      console.log(res.data)
       return res.data; 
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Signup failed");
@@ -30,6 +33,29 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+
+export const updateUser= createAsyncThunk(
+  "auth/updateUser",
+  async(formData,{rejectWithValue})=>{
+    console.log(user)
+    try {
+      const res = await API.put(`update/${user.id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      )
+      console.log(res.data)
+      return res.data; 
+      
+    } catch (error) {
+      console.log(error.message)
+      return rejectWithValue(error.message)
+    }
+  }
+)
 
 const authSlice = createSlice({
   name: "auth",
@@ -87,7 +113,13 @@ const authSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+      .addCase(updateUser.fulfilled,(state,action)=>{
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        localStorage.setItem("authToken", action.payload.token);
+        localStorage.setItem("userInfo", JSON.stringify(action.payload.user));
+      })
   },
 });
 

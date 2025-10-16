@@ -10,9 +10,10 @@ const orderSchema = new mongoose.Schema({
   ],
   totalAmount: Number,
   paymentStatus: { type: String, enum: ['pending', 'paid', 'failed'], default: 'pending' },
-  orderStatus: { type: String, enum: ['processing', 'shipped', 'delivered', 'cancelled'], default: 'processing' },
+  orderStatus: { type: String, enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled'], default: 'Processing' },
   shippingAddress: String,
   orderedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Order', orderSchema);
+const orderModel = mongoose.model('Order', orderSchema);
+module.exports=orderModel

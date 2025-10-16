@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../features/authSlice";
@@ -8,6 +8,7 @@ const Login = () => {
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
   let [message, setMessage] = useState("");
+  let [err,setErr]=useState("")
   let navigate=useNavigate()
   let dispatch=useDispatch()
   let {loading,error}=useSelector((state)=>state.auth)
@@ -27,6 +28,12 @@ const Login = () => {
       setMessage(error.message);
     }
   }
+  useEffect(()=>{
+    setErr(error)
+    setTimeout(() => {
+      setErr("")
+    }, 2000);
+  },[error])
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">

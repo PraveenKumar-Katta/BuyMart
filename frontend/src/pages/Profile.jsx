@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateUser } from '../features/authSlice'
 
 const Profile = () => {
   const navigate = useNavigate()
   const storedUser = JSON.parse(localStorage.getItem('userInfo'))
 
   const [user, setUser] = useState(storedUser || {})
+  let {auth}=useSelector((state)=>state)
+  console.log(auth)
+  let dispatch=useDispatch()
   const [editing, setEditing] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', password: '' })
   const [message, setMessage] = useState('')
@@ -26,19 +30,12 @@ const Profile = () => {
   const handleUpdate = async (e) => {
     e.preventDefault()
     try {
-      const res = await axios.put(
-        `http://localhost:5000/api/users/${user.id}`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${user.token}`
-          }
-        }
-      )
-      localStorage.setItem('userInfo', JSON.stringify(res.data))
-      setUser(res.data)
-      setEditing(false)
-      setMessage('Profile updated successfully ✅')
+      console.log("save changes entered")
+      dispatch(updateUser(formData)).unwrap().then(()=>{
+        setEditing(false)
+        setMessage('Profile updated successfully ✅')
+      })
+      
     } catch (err) {
       setMessage('Update failed ❌')
     }

@@ -14,12 +14,8 @@ app.use(cors({
   origin: '*'
 }));
 
-
-
-
 connectDB()
 let PORT=process.env.PORT
-
 
 app.use("/auth",authRoute)
 app.use("/categories",categoryRoute)

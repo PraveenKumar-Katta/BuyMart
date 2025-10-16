@@ -1,15 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchCart } from "../features/cartSlice";
 import { setSearchTerm } from "../features/productSlice";
-import { CircleUser, ShoppingCart } from "lucide-react";
+import { CircleUser, ShoppingCart, Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cart } = useSelector((state) => state.cart);
   const user = JSON.parse(localStorage.getItem("userInfo"));
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -21,17 +23,27 @@ const Navbar = () => {
     dispatch(setSearchTerm(e.target.value));
   };
 
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
   return (
     <div>
+      {/* Navbar */}
       <header className="flex justify-between items-center px-4 py-2 shadow">
-        <div className="flex items-center gap-6 w-3/4">
+        <div className="flex items-center gap-4 w-3/4">
+          {/* Mobile Menu Button */}
+          <button className="md:hidden" onClick={toggleSidebar}>
+            <Menu size={28} />
+          </button>
+
+          {/* Logo */}
           <div
-            className="text-indigo-600 font-bold text-xl cursor-pointer"
+            className="text-indigo-600 font-bold text-xl cursor-pointer hidden md:block"
             onClick={() => navigate("/")}
           >
             BuyMart
           </div>
 
+          {/* Search (always visible) */}
           {user?.role === "user" && (
             <div className="flex-1">
               <input
@@ -44,13 +56,9 @@ const Navbar = () => {
           )}
         </div>
 
-        <div className="flex items-center gap-6 w-1/4 justify-end text-sm">
-          <button
-            onClick={() => navigate("/profile")}
-            className="flex items-center gap-1 cursor-pointer hover:text-blue-600"
-          >
-            <CircleUser />
-          </button>
+        {/* Right Side */}
+        <div className="flex items-center gap-4 w-1/4 justify-end text-sm">
+          {/* Cart (always visible) */}
           {user?.role === "user" && (
             <div
               onClick={() => navigate("/cart")}
@@ -66,6 +74,57 @@ const Navbar = () => {
           )}
         </div>
       </header>
+
+      {/* Sidebar for Mobile */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 z-40"
+          onClick={toggleSidebar}
+        >
+          <div
+            className="absolute top-0 left-0 w-64 h-full bg-white shadow-lg p-5 flex flex-col gap-4 z-50"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button */}
+            <button className="self-end mb-4" onClick={toggleSidebar}>
+              <X size={28} />
+            </button>
+
+            {/* Sidebar Links */}
+            <button
+              onClick={() => {
+                navigate("/");
+                toggleSidebar();
+              }}
+              className="py-2 px-3 rounded hover:bg-gray-100 text-left"
+            >
+              Home
+            </button>
+
+            {user?.role === "user" && (
+              <button
+                onClick={() => {
+                  navigate("/myorders");
+                  toggleSidebar();
+                }}
+                className="py-2 px-3 rounded hover:bg-gray-100 text-left"
+              >
+                My Orders
+              </button>
+            )}
+
+            <button
+              onClick={() => {
+                navigate("/profile");
+                toggleSidebar();
+              }}
+              className="py-2 px-3 rounded hover:bg-gray-100 text-left"
+            >
+              Profile
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

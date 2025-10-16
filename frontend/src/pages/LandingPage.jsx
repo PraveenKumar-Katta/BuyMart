@@ -5,25 +5,26 @@ import { motion } from "framer-motion";
 const features = [
   {
     icon: "🛒",
-    title: "Shop Smarter",
-    desc: "AI-driven recommendations and fast search to find what you need, instantly.",
+    title: "Easy Ordering",
+    desc: "Place and manage your orders seamlessly with real-time updates.",
   },
   {
     icon: "📦",
-    title: "Real-Time Tracking",
-    desc: "Track your packages from dispatch to doorstep with live updates.",
+    title: "Order Tracking",
+    desc: "Track your orders from processing to delivery with clear status updates.",
   },
   {
-    icon: "💳",
-    title: "Secure Payments",
-    desc: "Multiple payment options with bank-level encryption and fraud protection.",
+    icon: "📊",
+    title: "Inventory Management",
+    desc: "Vendors can manage products, stock levels, and availability with ease.",
   },
   {
     icon: "🚀",
-    title: "Seller Dashboard",
-    desc: "Manage inventory, orders, and earnings all in one intuitive dashboard.",
+    title: "Vendor Dashboard",
+    desc: "Stay in control of orders and customers with a powerful dashboard.",
   },
 ];
+
 
 const testimonials = [
   {
@@ -129,7 +130,7 @@ const LandingPage = () => {
             Join BuyMart today and step into the future of online marketplaces.
           </p>
           <button
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/login")}
             className="px-8 py-3 bg-white text-blue-900 font-semibold rounded-full shadow-lg hover:scale-105 transition"
           >
             Get Started Now

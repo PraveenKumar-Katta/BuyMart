@@ -10,14 +10,37 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BaseUrl } from "../utiles";
+import VendorOrders from "./VendorOrders";
+import { fetchOrders } from "../features/orderSlice";
+
 
 const VendorDashBoard = () => {
+  const [activeTab, setActiveTab] = useState("products");
   const [showForm, setShowForm] = useState(null);
   let [vendorProducts, setVendorProducts] = useState([]);
   let [edit, setEdit] = useState(false);
   let dispatch = useDispatch();
   let user = JSON.parse(localStorage.getItem("userInfo"));
   let products = useSelector((state) => state.products.products);
+  let {orders} = useSelector((state) => state.orders);
+  
+  const myOrderProducts = orders.flatMap((o) =>
+    o.products
+      .filter((p) => p.product.vendorId == user.id&&o.orderStatus!=="Cancelled")
+      .map((p) => ({
+        ...p,
+        customer: o.user,
+        status:o.orderStatus,
+        orderId:o._id
+      }))
+  );
+  
+  
+  let lowStock = products.filter((p) => p.stock < 100);
+
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, []);
 
   useEffect(() => {
     if (Array.isArray(products) && user?.id) {
@@ -94,7 +117,7 @@ const VendorDashBoard = () => {
 
   return (
     <div className="p-4 relative">
-      <ToastContainer /> 
+      <ToastContainer />
       <div className="mb-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Vendor Dashboard</h1>
         <button
@@ -193,63 +216,113 @@ const VendorDashBoard = () => {
       <div className={`transition duration-300 ${showForm ? "blur-sm" : ""}`}>
         {/* Dashboard Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-2xl shadow p-4 text-center">
+          <div
+            onClick={() => setActiveTab("products")}
+            className="bg-white rounded-2xl shadow cursor-pointer p-4 text-center"
+          >
             <h2 className="text-xl font-semibold">Total Products</h2>
             <p className="text-2xl text-blue-600 font-bold">
               {vendorProducts.length}
             </p>
           </div>
-          <div className="bg-white rounded-2xl shadow p-4 text-center">
+          <div
+            onClick={() => setActiveTab("orders")}
+            className="bg-white cursor-pointer rounded-2xl shadow p-4 text-center"
+          >
             <h2 className="text-xl font-semibold">Orders</h2>
-            <p className="text-2xl text-green-600 font-bold">15</p>
+            <p className="text-2xl text-green-600 font-bold">
+              {myOrderProducts.length}
+            </p>
           </div>
-          <div className="bg-white rounded-2xl shadow p-4 text-center">
+          <div className="bg-white cursor-pointer rounded-2xl shadow p-4 text-center">
             <h2 className="text-xl font-semibold">Earnings</h2>
             <p className="text-2xl text-yellow-500 font-bold">₹12,300</p>
           </div>
-          <div className="bg-white rounded-2xl shadow p-4 text-center">
+          <div
+            onClick={() => setActiveTab("lowstock")}
+            className="bg-white cursor-pointer rounded-2xl shadow p-4 text-center"
+          >
             <h2 className="text-xl font-semibold">Low Stock</h2>
-            <p className="text-2xl text-red-500 font-bold">4</p>
+            <p className="text-2xl text-red-500 font-bold">{lowStock.length}</p>
           </div>
         </div>
       </div>
-      <div>
-        {Array.isArray(vendorProducts) && vendorProducts.length > 0 ? (
-          <div className="mt-6">
-            {vendorProducts.map((p) => (
+      {activeTab === "lowstock" && (
+        <div className="p-6">
+          <h1 className="text-2xl font-bold mb-4 text-red-600">⚠️ Low Stock</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {lowStock.map((p) => (
               <div
                 key={p._id}
-                className="border flex justify-between items-center p-2 m-1 rounded"
+                className="border border-gray-300 rounded-xl p-4 shadow hover:shadow-lg transition"
               >
-                <p>{p.name}</p>
-                <div className="flex gap-2">
-                  <button onClick={() => handleEdit(p)} className="border p-1">
-                    Edit
-                  </button>
-                  <button
-                    className="border p-1 text-red-500"
-                    onClick={() => {
-                      dispatch(deleteProduct(p._id));
-                      toast.success("Product Deleted!", {
-                        position: "top-right",
-                        autoClose: 2000,
-                        hideProgressBar: false,
-                        pauseOnHover: true,
-                        draggable: true,
-                        theme: "colored",
-                      });
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
+                <h2 className="text-lg font-semibold">{p.name}</h2>
+                <p className="text-sm text-gray-600">Price: ₹{p.price}</p>
+                <p className="text-sm text-gray-600">
+                  Stock Left:
+                  <span className="font-bold text-red-500"> {p.stock}</span>
+                </p>
               </div>
             ))}
           </div>
-        ) : (
-          <p className="mt-4 text-gray-500">No products found.</p>
-        )}
-      </div>
+        </div>
+      )}
+      {activeTab == "orders" && (
+        <VendorOrders myOrderProducts={myOrderProducts} />
+      )}
+      {activeTab == "products" && (
+        <div className="p-6">
+          {Array.isArray(vendorProducts) && vendorProducts.length > 0 ? (
+            <div className="space-y-4">
+              {vendorProducts.map((p) => (
+                <div
+                  key={p._id}
+                  className="flex justify-between items-center p-4 bg-white shadow-md rounded-xl hover:shadow-lg transition"
+                >
+                  {/* Product Info */}
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      {p.name}
+                    </h2>
+                    <p className="text-sm text-gray-500">Stock: {p.stock}</p>
+                    <p className="text-sm text-gray-500">Price: ₹{p.price}</p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(p)}
+                      className="px-3 py-1 rounded-lg bg-blue-500 text-white text-sm hover:bg-blue-600 transition"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        dispatch(deleteProduct(p._id));
+                        toast.success("Product Deleted!", {
+                          position: "top-right",
+                          autoClose: 2000,
+                          hideProgressBar: false,
+                          pauseOnHover: true,
+                          draggable: true,
+                          theme: "colored",
+                        });
+                      }}
+                      className="px-3 py-1 rounded-lg bg-red-500 text-white text-sm hover:bg-red-600 transition"
+                    >
+                      🗑 Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-4 text-gray-500 italic text-center">
+              No products found.
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

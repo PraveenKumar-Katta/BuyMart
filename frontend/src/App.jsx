@@ -9,6 +9,8 @@ import Cart from './components/Cart'
 import LandingPage from './pages/LandingPage'
 import Profile from './pages/Profile'
 import CategoryItems from './pages/CategoryItems'
+import UserOrder from './components/UserOrder'
+
 
 function App() {
   
@@ -21,6 +23,7 @@ function App() {
       <Route path='/dashboard' element={<Home/>} />
       <Route path='/dashboard/product/:id' element={<Product/>} />
       <Route path='/cart' element={<Cart/>} />
+      <Route path='/myorders' element={<UserOrder/>}/>
       <Route path='/profile' element={<Profile/>}/>
       <Route path="/category/:id" element={<CategoryItems />} />
     </Routes>

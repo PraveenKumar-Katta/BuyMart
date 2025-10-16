@@ -1,11 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { BaseUrl } from "../utiles";
 
 export const fetchProducts = createAsyncThunk(
   "products/fetchAll",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await axios.get("http://localhost:5000/products/get-products");
+      const res = await axios.get(`${BaseUrl}/products/get-products`);
       return res.data.products;
     } catch (error) {
       return rejectWithValue(
@@ -20,7 +21,7 @@ export const deleteProduct = createAsyncThunk(
   async (productId, { rejectWithValue }) => {
     const token = localStorage.getItem("authToken");
     try {
-      await axios.delete(`http://localhost:5000/products/delete-product/${productId}`, {
+      await axios.delete(`${BaseUrl}/products/delete-product/${productId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -38,7 +39,7 @@ export const updateProduct = createAsyncThunk(
     const token = localStorage.getItem("authToken");
     try {
       const res = await axios.put(
-        `http://localhost:5000/products/update-product/${productId}`,
+        `${BaseUrl}/products/update-product/${productId}`,
         updatedData,
         {
           headers: {
@@ -59,7 +60,7 @@ export const addProduct = createAsyncThunk(
   async (product, { rejectWithValue }) => {
     const token = localStorage.getItem("authToken");
     try {
-      const res = await axios.post("http://localhost:5000/products/add-product", product, {
+      const res = await axios.post(`${BaseUrl}/products/add-product`, product, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

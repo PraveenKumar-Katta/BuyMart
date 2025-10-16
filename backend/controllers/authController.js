@@ -7,6 +7,11 @@ const signupUser = async (req, res) => {
   if (!name || !email || !password || !role) {
     return res.status(400).json({ message: "Incomplete User Information" });
   }
+  let user=await userModel.findOne({email})
+   
+  if(user){
+    return res.status(403).send({message:"Email Already Registered!"})
+  }
   try {
     bcrypt.hash(password, saltRounds, async function (err, hash) {
       if (err) {
@@ -54,9 +59,38 @@ const loginUser = async (req, res) => {
       });
     });
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
     res.status(500).json({ error: error.message });
   }
 };
 
-module.exports = { signupUser, loginUser };
+const updateUser = async (req, res) => {
+  const userId = req.params.id;
+  let userData = { ...req.body };
+  console.log(userId)
+  console.log(userData)
+
+  try {
+    if (userData.password) {
+      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+      userData.password = hashedPassword;
+    }
+
+    const user = await userModel.findByIdAndUpdate(
+      userId,
+      { $set: userData },
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found ❌" });
+    }
+
+    res.status(200).json({ message: "User updated ✅", user });
+  } catch (error) {
+    console.error("Update error:", error.message);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports = { signupUser, loginUser, updateUser };

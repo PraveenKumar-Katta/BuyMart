@@ -24,16 +24,24 @@ const Signup = () => {
         password,
         role,
       };
+      console.log(formData)
       await dispatch(signupUser(formData)).unwrap();
       setMessage("Signup successful!");
       setName("");
       setEmail("");
       setPassword("");
       setRole("user");
+      alert("singup")
     } catch (error) {
       setMessage(error.message);
     } 
   }
+  useEffect(()=>{
+    setError(error)
+    setTimeout(() => {
+      setError("")
+    }, 2000);
+  },[error])
   
 
   return (
