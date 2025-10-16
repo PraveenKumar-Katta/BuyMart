@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchCart } from "../features/cartSlice";
 import { setSearchTerm } from "../features/productSlice";
-import { CircleUser, ShoppingCart, Menu, X } from "lucide-react";
+import { CircleUser, ShoppingCart, Menu, X, CircleUserIcon } from "lucide-react";
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -17,7 +17,7 @@ const Navbar = () => {
     if (user?.id) {
       dispatch(fetchCart(user.id));
     }
-  }, []);
+  }, [dispatch, user?.id]);
 
   const handleSearch = (e) => {
     dispatch(setSearchTerm(e.target.value));
@@ -43,7 +43,7 @@ const Navbar = () => {
             BuyMart
           </div>
 
-          {/* Search (always visible) */}
+          {/* Search (always visible for users) */}
           {user?.role === "user" && (
             <div className="flex-1">
               <input
@@ -56,8 +56,27 @@ const Navbar = () => {
           )}
         </div>
 
-        {/* Right Side */}
+        {/* Right Side (Desktop only for Profile & Orders) */}
         <div className="flex items-center gap-4 w-1/4 justify-end text-sm">
+          {/* My Orders - visible only on md and up */}
+          {user?.role === "user" && (
+            <button
+              onClick={() => navigate("/myorders")}
+              className="hidden md:block text-gray-700 hover:text-blue-600"
+            >
+              My Orders
+            </button>
+          )}
+
+          {/* Profile - visible only on md and up */}
+            
+            
+
+            <CircleUserIcon
+            className="hidden md:block text-gray-700 hover:text-blue-600"
+             onClick={() => navigate("/profile")} />
+
+
           {/* Cart (always visible) */}
           {user?.role === "user" && (
             <div
