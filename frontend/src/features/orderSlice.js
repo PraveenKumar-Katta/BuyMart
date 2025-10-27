@@ -34,6 +34,7 @@ export const fetchOrders = createAsyncThunk(
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log(res.data)
       return res.data.orders;
     } catch (error) {
       return rejectWithValue(
@@ -67,7 +68,7 @@ export const updateOrderStatus = createAsyncThunk(
       );
     }
   }
-);
+); 
 
 const orderSlice = createSlice({
   name: "orders",
