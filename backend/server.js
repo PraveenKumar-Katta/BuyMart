@@ -10,9 +10,14 @@ require("dotenv").config()
 const app=express()
 app.use(express.json())
 
-app.use(cors({
-  origin: '*'
-}));
+app.use(
+  cors({
+    origin: "https://buymart-shop.netlify.app",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 connectDB()
 let PORT=process.env.PORT
