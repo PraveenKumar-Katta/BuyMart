@@ -10,6 +10,7 @@ import LandingPage from './pages/LandingPage'
 import Profile from './pages/Profile'
 import CategoryItems from './pages/CategoryItems'
 import UserOrder from './components/UserOrder'
+import { ToastContainer } from 'react-toastify'
 
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
       <Route path='/profile' element={<Profile/>}/>
       <Route path="/category/:id" element={<CategoryItems />} />
     </Routes>
+    <ToastContainer position="top-center" />
     </>
   )
 }

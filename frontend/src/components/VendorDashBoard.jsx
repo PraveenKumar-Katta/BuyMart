@@ -7,7 +7,7 @@ import {
   updateProduct,
 } from "../features/productSlice";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BaseUrl } from "../utiles";
 import VendorOrders from "./VendorOrders";
@@ -117,7 +117,6 @@ const VendorDashBoard = () => {
 
   return (
     <div className="p-4 relative">
-      <ToastContainer />
       <div className="mb-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Vendor Dashboard</h1>
         <button
