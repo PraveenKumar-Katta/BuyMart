@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateUser } from '../features/authSlice'
+import { User, Mail, Lock, LogOut, Pencil, X } from 'lucide-react'
 
 const Profile = () => {
   const navigate = useNavigate()
   const storedUser = JSON.parse(localStorage.getItem('userInfo'))
 
-  const [user, setUser] = useState(storedUser || {})
-  let {auth}=useSelector((state)=>state)
-  console.log(auth)
-  let dispatch=useDispatch()
+  const [user, setUser] = useState(storedUser || null)
+  const { auth } = useSelector((state) => state)
+  const dispatch = useDispatch()
   const [editing, setEditing] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', password: '' })
   const [message, setMessage] = useState('')
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     if (!user) {
@@ -24,20 +25,20 @@ const Profile = () => {
   }, [user, navigate])
 
   const handleChange = (e) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
   const handleUpdate = async (e) => {
     e.preventDefault()
+    setSaving(true)
     try {
-      console.log("save changes entered")
-      dispatch(updateUser(formData)).unwrap().then(()=>{
-        setEditing(false)
-        setMessage('Profile updated successfully ✅')
-      })
-      
+      await dispatch(updateUser(formData)).unwrap()
+      setEditing(false)
+      setMessage('Profile updated successfully')
     } catch (err) {
-      setMessage('Update failed ❌')
+      setMessage('Update failed — please try again')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -49,87 +50,145 @@ const Profile = () => {
   if (!user) return null
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-xl bg-white shadow-xl rounded-lg p-8">
-        <div className="flex flex-col items-center mb-6">
-          <img
-            src="https://thumbs.dreamstime.com/z/student-avatar-illustration-user-profile-icon-youth-avatar-student-avatar-illustration-simple-cartoon-user-portrait-user-profile-276205531.jpg"
-            alt="User Avatar"
-            className="w-24 h-24 rounded-full mb-4 border-4 border-gray-300 object-cover"
-          />
-          <h2 className="text-2xl font-bold">👤 Your Profile</h2>
-          <p className="text-sm text-gray-600">{user.role?.toUpperCase()}</p>
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+        <Link
+        to="/dashboard"
+        className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-zinc-500 transition hover:text-zinc-900"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="h-4 w-4"
+          aria-hidden="true"
+        >
+          <path d="M15 18l-6-6 6-6" />
+        </svg>
+        Back to Dashboard
+      </Link>
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-20 h-20 rounded-full bg-slate-900 flex items-center justify-center mb-4">
+            <User className="w-9 h-9 text-white" strokeWidth={1.5} />
+          </div>
+          <h2 className="text-xl font-semibold text-slate-900">{user.name}</h2>
+          {user.role && (
+            <span className="mt-1 inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium capitalize text-slate-600 ring-1 ring-slate-200">
+              {user.role}
+            </span>
+          )}
         </div>
 
         {editing ? (
           <form onSubmit={handleUpdate} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium">Name</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="border rounded w-full p-2"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="border rounded w-full p-2"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium">New Password</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="border rounded w-full p-2"
-                placeholder="Leave blank to keep old password"
-              />
-            </div>
-            <div className="flex justify-between">
-              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">
-                Save Changes
-              </button>
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-medium text-slate-900">Edit details</h3>
               <button
                 type="button"
-                className="text-gray-600 underline"
                 onClick={() => setEditing(false)}
+                className="text-slate-400 hover:text-slate-600"
               >
-                Cancel
+                <X className="w-4 h-4" />
               </button>
             </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Name</label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-slate-200 pl-9 pr-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">Email</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-slate-200 pl-9 pr-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-500 mb-1">New password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Leave blank to keep current password"
+                  className="w-full rounded-lg border border-slate-200 pl-9 pr-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-400"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="w-full rounded-lg bg-slate-900 text-white text-sm font-medium py-2.5 hover:bg-slate-800 transition-colors disabled:opacity-60"
+            >
+              {saving ? 'Saving…' : 'Save changes'}
+            </button>
           </form>
         ) : (
-          <div className="space-y-3">
-            <p><span className="font-semibold">Name:</span> {user.name}</p>
-            <p><span className="font-semibold">Email:</span> {user.email}</p>
+          <div className="space-y-4">
+            <div className="rounded-lg border border-slate-200 divide-y divide-slate-100">
+              <div className="flex items-center gap-3 px-4 py-3">
+                <User className="w-4 h-4 text-slate-400 shrink-0" />
+                <div>
+                  <p className="text-xs text-slate-400">Name</p>
+                  <p className="text-sm font-medium text-slate-900">{user.name}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 px-4 py-3">
+                <Mail className="w-4 h-4 text-slate-400 shrink-0" />
+                <div>
+                  <p className="text-xs text-slate-400">Email</p>
+                  <p className="text-sm font-medium text-slate-900">{user.email}</p>
+                </div>
+              </div>
+            </div>
+
             <button
               onClick={() => setEditing(true)}
-              className="mt-4 bg-yellow-500 text-white px-4 py-2 rounded"
+              className="w-full flex items-center justify-center gap-2 rounded-lg border border-slate-200 text-slate-700 text-sm font-medium py-2.5 hover:bg-slate-50 transition-colors"
             >
-              Edit Profile
+              <Pencil className="w-4 h-4" />
+              Edit profile
             </button>
           </div>
         )}
 
         <button
           onClick={handleLogout}
-          className="mt-6 bg-red-600 text-white px-4 py-2 rounded w-full"
+          className="mt-3 w-full flex items-center justify-center gap-2 rounded-lg bg-rose-50 text-rose-600 text-sm font-medium py-2.5 hover:bg-rose-100 transition-colors"
         >
-          Logout
+          <LogOut className="w-4 h-4" />
+          Log out
         </button>
 
-        {message && <p className="mt-4 text-sm text-green-600">{message}</p>}
+        {message && (
+          <p className="mt-4 text-center text-sm text-emerald-600">{message}</p>
+        )}
       </div>
     </div>
   )
